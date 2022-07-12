@@ -10,7 +10,7 @@ maintainer:         grodrigues.math@gmail.com
 copyright:          2022 G. Rodrigues
 category:           Data
 build-type:         Simple
-extra-source-files: README.md, CHANGELOG.md, LICENSE
+extra-source-files: README.md, CHANGELOG.md, LICENSE, stack.yaml
 cabal-version:      >=1.10
 
 library
