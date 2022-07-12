@@ -26,7 +26,7 @@ Actions are two-parameter type classes. We follow [monoid-extras package](https:
 
 ## Installation.
 
-To install the package, just:
+The package only depends on base; use the usual Haskell facilities to install it. To build the package, just:
 
     stack build
 
