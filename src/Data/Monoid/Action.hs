@@ -258,7 +258,7 @@ instance Semigroup (Summation Int) where
 
 
 instance Monoid (Summation Int) where
-    mempty = Summation 1
+    mempty = Summation 0
 
 
 instance Num b => Action (Summation Int) (Summation b) where
@@ -294,7 +294,7 @@ instance Semigroup (Multiplication Word) where
 
 
 instance Monoid (Multiplication Word) where
-    mempty = Multiplication 0
+    mempty = Multiplication 1
 
 
 instance Num b => RightAction (Multiplication Word) (Multiplication b) where
