@@ -1,0 +1,25 @@
+name:               monoid-actions
+version:            0.1.0.0
+synopsis:           A Haskell library for the monoid action type class and related instances.
+description:        Please see the README on GitHub at <https://github.com/lambda-dom/monoid-actions#readme>
+homepage:           https://github.com/lambda-dom/monoid-actions#readme
+license:            BSD3
+license-file:       LICENSE
+author:             G. Rodrigues
+maintainer:         grodrigues.math@gmail.com
+copyright:          2022 G. Rodrigues
+category:           Data
+build-type:         Simple
+extra-source-files: README.md, CHANGELOG.md, LICENSE
+cabal-version:      >=1.10
+
+library
+  hs-source-dirs:   src
+  exposed-modules:  Data.Monoid.Action
+  build-depends:    base >= 4.7 && < 5
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror
+
+source-repository head
+  type:             git
+  location:         https://github.com/githubuser/monoid-actions

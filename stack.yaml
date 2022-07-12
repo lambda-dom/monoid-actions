@@ -1,0 +1,6 @@
+# Resolver.
+resolver: lts-18.28
+
+# Packages.
+packages:
+- .
