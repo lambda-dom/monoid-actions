@@ -165,18 +165,18 @@ instance Monoid m => Monad (Free m) where
 -- The underlying type is @m -> a@ with action
 --
 -- @
---  m |*> t = \ n -> t (m <> n)
+--  m |*> t = \ n -> t (n <> m)
 -- @
 --
--- Note that multiplication inside the function is on the left. This is a functor with
--- values in actions so @fmap f@ is an equivariant map.
+-- Note that multiplication inside @t@ is on the /right/. This is a functor with values
+-- in actions so @fmap f@ is an equivariant map.
 newtype Cofree m a
     = Cofree (m -> a)   -- ^ The constructor for @t :: m -> a@.
     deriving (Functor)
 
 
 instance Monoid m => Action m (Cofree m a) where
-    (|*>) m (Cofree t) = Cofree (t . (m <>))
+    (|*>) m (Cofree t) = Cofree (t . (<> m))
 
 
 -- Adjunction-related functions.
