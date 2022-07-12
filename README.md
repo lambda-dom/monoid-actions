@@ -2,11 +2,16 @@
 
 ## Some mathematics.
 
-Let $M$ be a monoid. Then a (left) *action* of $M$ on a set $X$ is a map $\mu\colon M\times X\to X$ (and putting $\mu (m, x) = m \cdot x$ and denoting multiplication in $M$ by juxtaposition to simplify the notation) such that:
+Let $M$ be a monoid. Then a (left) *action* of $M$ on a set $X$ is a map $\mu\colon M\times X\to X$ (and putting $\mu (m, x) = m \cdot x$ and denoting multiplication in $M$ by juxtaposition to simplify the notation) such that it satisfies two laws, the *identity laws*
 
 $$
-\text{Identity}: 1 \cdot x = x = x \cdot 1, \forall x\in X\newline
-\text{Associativity}: n \cdot (m \cdot x) = (nm) \cdot x, \forall x\in X, \forall n, m \in M
+1 \cdot x = x = x \cdot 1, \forall x\in X
+$$
+
+And *associativity*
+
+$$
+n \cdot (m \cdot x) = (nm) \cdot x, \forall x\in X, \forall n, m \in M
 $$
 
 We can also define right actions in an obvious way (do not forget to suitably change associativity), but since there is an isomorphism between the category of left $M$-actions and the category of right $M^{\ast}$-actions, where $M^{\ast}$ is the opposite (or dual) monoid, for most mathematical purposes there is no loss of generality in sticking to left actions alone. Speaking of categories of actions, here is their definition: if $\mu\colon M\times X\to X$ and $\nu\colon M\times Y\to Y$ are two $M$-actions, than an *equivariant* map $\mu\to \nu$ is a map $f\colon X\to Y$ such that
