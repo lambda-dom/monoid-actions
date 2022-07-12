@@ -16,7 +16,6 @@ module Data.Monoid.Action
 
         -- * Left and right adjoints to the underlying-type functor.
         -- $adjoints
-
         , Free (..)
         , Cofree (..)
 
@@ -107,7 +106,7 @@ instance Action m b => Action m (a -> b) where
 
 -- | Lift an action to 'Maybe'.
 --
--- More generally, any action can be lifted over a functor. We do not write such an
+-- More generally, any action can be lifted over a functor. We do not provide such an
 -- action to avoid instance overlapping.
 instance Action m a => Action m (Maybe a) where
     (|*>) m = fmap (m |*>)
@@ -125,10 +124,10 @@ instance RightAction m a => Action (Dual m) a where
 
 -- $adjoints
 -- The functor (in the strict mathematical sense) sending @Act m a@ to @a@ has both a left
--- adjoint @Free m@ and a right adjoint @Cofree m@. The former adjunction generates an
+-- adjoint @Free m@ and a right adjoint @Cofree m@. The former adjunction generates a
 -- monad on the category of types and the latter a /comonad/. Since base does not have a
--- type class for comonad (one cxan be found in [comonad](https://hackage.haskell.org/package/comonad)),
--- we just give the monad instance for @Free m@.
+-- type class for comonad (one can be found in [comonad](https://hackage.haskell.org/package/comonad)),
+-- we just give the monad instance for 'Free', pun intended.
 
 -- | The free action on @a@.
 --
