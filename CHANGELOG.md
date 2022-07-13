@@ -8,6 +8,7 @@
 * Missing monoid action.
 * Use Endo wrapper instead of homegrown one.
 * Drop extraneous wrapping.
+* Drop multiplicative action on Num instances.
 * Documentation improvements.
 
 note(s):

@@ -38,6 +38,8 @@ import Data.Monoid (Dual (..), Endo (Endo))
 import Data.Foldable (Foldable(foldl'))
 
 -- $documentation
+-- The (monoid) action type class.
+--
 -- 'Action' instances fall in two main families. The first is the construction of
 -- @Action m@ instances from the fact that the underlying-type functor creates all
 -- limits and colimits. The second family are instances @Action Natural@ where
@@ -233,7 +235,7 @@ copure x = Cofree (|*> x)
 --  M\to \mathbf{Mon}(\mathbb{N}, M)
 -- \]
 --
--- Where \(\mathbf{Mon}\) is the category of monoid. The action is precisely the curried
+-- Where \(\mathbf{Mon}\) is the category of monoids. The action is precisely the curried
 -- version of this isomorphism. Note that while the monoid /morphisms/ are morphisms for
 -- addition, the /action/ is on the right and involves the multiplication, that is, the
 -- action law takes the exponential form
@@ -243,9 +245,9 @@ copure x = Cofree (|*> x)
 -- @
 --
 -- Instead of constructing the action on say, the (Peano) naturals, we bring it down to
--- 'Word'. Strictly speaking this is not an action because of overflow, but if you are
--- hitting overflow you have bigger problems than violation of the action laws. To avoid
--- confusion and instance overlapping, we wrap 'Word' in a 'Multiplication' wrapper.
+-- 'Word' by wrapping in a newtype. Strictly speaking 'Word' is not a monoid because of
+-- overflow, but if you are hitting overflow you have bigger problems than violation of
+-- the monoid laws.
 
 -- | A wrapper for monoids in a multiplicative guise.
 newtype Multiplication a
@@ -276,13 +278,20 @@ instance Monoid m => RightAction (Multiplication Word) m where
     (<*|) x (Multiplication n) = foldl' (<>) mempty (replicate (fromIntegral n) x)
 
 
+-- | The action @Num b => Natural -> b -> b@ given by
+--
+--  @
+--    n |*> x = x + ... + x = nx
+--  @
+--
+-- It satisfies
+--
+-- prop> (n + m) |*> x = n |*> (m |*> x)
+--
+-- and lifts to Integers since @x@ has an (additive) inverse. As per the multiplicative
+-- examples, instead of using something like the arbitrary-precision integers, we just
+-- wrap 'Int'.
 instance Num b => Action (Summation Int) b where
     (|*>) (Summation n) x
         = sum (replicate (abs n) y)
         where y = if n >= 0 then x else -x
-
--- | The multiplicative action @Num b => b -> Natural -> b@.
---
--- Since there is overlapping with the right monoid action, we wrap @Num b@ as well.
-instance Num b => RightAction (Multiplication Word) (Multiplication b) where
-    (<*|) (Multiplication x) (Multiplication n) = Multiplication (product (replicate (fromIntegral n) x))
