@@ -224,9 +224,9 @@ copure x = Cofree (|*> x)
 -- The action @Monoid m => Natural -> m -> m@ given by (written multiplicatively) where
 -- @Natural@ is the monoid of the Natural numbers under addition. 
 --
---  @
---    x \<*| n = x \<\> ... \<\> x = x ^ n
---  @
+-- @
+--  x \<*| n = x \<\> ... \<\> x = x ^ n
+-- @
 --
 -- Another way to view this action is to note that @Natural@ is the free monoid on @()@ so
 -- that we have an isomorphism
@@ -280,9 +280,9 @@ instance Monoid m => RightAction (Multiplication Word) m where
 
 -- | The action @Num b => Natural -> b -> b@ given by
 --
---  @
---    n |*> x = x + ... + x = nx
---  @
+-- @
+--  n |*> x = x + ... + x = nx
+-- @
 --
 -- It satisfies
 --
