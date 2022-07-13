@@ -26,14 +26,13 @@ module Data.Monoid.Action
         , copure
         , coextract
 
-        -- * Monoid wrappers.
-        -- $monoid-wrappers
-        , Multiplication (..)
+        -- * 'Natural' Actions.
+        -- $natural-actions
     )
     where
 
 -- Imports.
-import Data.Monoid (Dual (Dual), Endo (Endo))
+import Data.Monoid (Dual (Dual), Endo (Endo), Product (Product))
 import qualified Data.Foldable as Foldable (Foldable (foldl'))
 
 
@@ -221,7 +220,8 @@ copure :: Action m b => b -> Cofree m b
 copure x = Cofree (|*> x)
 
 
--- $monoid-wrappers
+-- Natural actions.
+-- $natural-actions
 -- The action @Monoid m => Natural -> m -> m@ given by (written multiplicatively) where
 -- @Natural@ is the monoid of the Natural numbers under addition. 
 --
@@ -246,33 +246,11 @@ copure x = Cofree (|*> x)
 -- @
 --
 -- Instead of constructing the action on say, the (Peano) naturals, we bring it down to
--- 'Word' by wrapping in a newtype. Strictly speaking 'Word' is not a monoid because of
--- overflow, but if you are hitting overflow you have bigger problems than violation of
--- the monoid laws.
-
--- | A wrapper for monoids in a multiplicative guise.
-newtype Multiplication a
-    = Multiplication a      -- ^ The constructor for @x :: a@.
-
-
-instance Semigroup (Multiplication Word) where
-    (<>) (Multiplication m) (Multiplication n) = Multiplication (m * n)
-
-
-instance Monoid (Multiplication Word) where
-    mempty = Multiplication 1
-
-
-instance Semigroup (Multiplication Int) where
-    (<>) (Multiplication m) (Multiplication n) = Multiplication (m * n)
-
-
-instance Monoid (Multiplication Int) where
-    mempty = Multiplication 1
-
-
-instance Monoid m => RightAction (Multiplication Word) m where
-    (<*|) x (Multiplication n) = Foldable.foldl' (<>) mempty (replicate (fromIntegral n) x)
+-- 'Word' by wrapping in a newtype. Strictly speaking, the 'Word' action will violate
+-- the action laws because of overflow, but if you are hitting overflow you have bigger
+-- problems than violation of the monoid laws.
+instance Monoid m => RightAction (Product Word) m where
+    (<*|) x (Product n) = Foldable.foldl' (<>) mempty (replicate (fromIntegral n) x)
 
 
 -- | The action @Num b => Integer -> b -> b@ given by
@@ -286,9 +264,9 @@ instance Monoid m => RightAction (Multiplication Word) m where
 -- prop> (n m) |*> x = n |*> (m |*> x)
 --
 -- The action lifts to 'Integer' because every @x@ has an (additive) inverse. As per the
--- examples above, instead of using something like the arbitrary-precision integers, we
--- just wrap 'Int'.
-instance Num b => Action (Multiplication Int) b where
-    (|*>) (Multiplication n) x
+-- examples with 'Word' above, instead of using something like the arbitrary-precision
+-- integers, we just wrap 'Int'.
+instance Num b => Action (Product Int) b where
+    (|*>) (Product n) x
         = sum (replicate (abs n) y)
         where y = if n >= 0 then x else -x

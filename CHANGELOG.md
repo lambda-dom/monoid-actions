@@ -1,6 +1,6 @@
 # Changelog.
 
-## One is Glad to be of Service: v0.1.1
+## One is Glad to be of Service: v0.1.2
 
 * Minor changes to the cabal file.
 * Changelog reordering.
@@ -9,7 +9,7 @@
 * Use Endo wrapper instead of homegrown one.
 * Drop extraneous wrapping.
 * Drop multiplicative action on Num instances.
-* Drop Summation wrapper.
+* Drop monoid wrappers.
 * Documentation improvements.
 
 note(s):
