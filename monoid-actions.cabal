@@ -1,5 +1,5 @@
 name:               monoid-actions
-version:            0.1.0.0
+version:            0.1.1.0
 synopsis:           A Haskell library for the monoid action type class and related instances.
 description:        Please see the README on GitHub at <https://github.com/lambda-dom/monoid-actions#readme>
 homepage:           https://github.com/lambda-dom/monoid-actions#readme
