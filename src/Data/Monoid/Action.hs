@@ -19,7 +19,7 @@ module Data.Monoid.Action
         , Free (..)
         , Cofree (..)
 
-        -- * Adjunction-related functions.
+        -- ** Adjunction-related functions.
         , free
         , extract
         , cofree
@@ -29,13 +29,13 @@ module Data.Monoid.Action
         -- * Monoid wrappers.
         -- $monoid-wrappers
         , Multiplication (..)
-        , Summation (..)
     )
     where
 
 -- Imports.
-import Data.Monoid (Dual (..), Endo (Endo))
-import Data.Foldable (Foldable(foldl'))
+import Data.Monoid (Dual (Dual), Endo (Endo))
+import qualified Data.Foldable as Foldable (Foldable (foldl'))
+
 
 -- $documentation
 -- The (monoid) action type class.
@@ -43,8 +43,9 @@ import Data.Foldable (Foldable(foldl'))
 -- 'Action' instances fall in two main families. The first is the construction of
 -- @Action m@ instances from the fact that the underlying-type functor creates all
 -- limits and colimits. The second family are instances @Action Natural@ where
--- 'Natural' are the (Peano) natural numbers and roughly correspond to /do something @n@ times/.
+-- 'Natural' are the (Peano) natural numbers and correspond to /do something @n@ times/.
 
+-- Type classes.
 -- | The type class for a left 'Monoid' action. It must satisfy the following two
 -- laws:
 --
@@ -261,37 +262,33 @@ instance Semigroup (Multiplication Word) where
 instance Monoid (Multiplication Word) where
     mempty = Multiplication 1
 
--- | A wrapper for (abelian) monoids in an additive guise.
-newtype Summation a
-    = Summation a      -- ^ The constructor for @x :: a@.
+
+instance Semigroup (Multiplication Int) where
+    (<>) (Multiplication m) (Multiplication n) = Multiplication (m * n)
 
 
-instance Semigroup (Summation Int) where
-    (<>) (Summation m) (Summation n) = Summation (m + n)
-
-
-instance Monoid (Summation Int) where
-    mempty = Summation 0
+instance Monoid (Multiplication Int) where
+    mempty = Multiplication 1
 
 
 instance Monoid m => RightAction (Multiplication Word) m where
-    (<*|) x (Multiplication n) = foldl' (<>) mempty (replicate (fromIntegral n) x)
+    (<*|) x (Multiplication n) = Foldable.foldl' (<>) mempty (replicate (fromIntegral n) x)
 
 
--- | The action @Num b => Natural -> b -> b@ given by
+-- | The action @Num b => Integer -> b -> b@ given by
 --
--- @
---  n |*> x = x + ... + x = nx
--- @
+--  @
+--   n |*> x = x + ... + x = nx
+--  @
 --
--- It satisfies
+-- With action law
 --
--- prop> (n + m) |*> x = n |*> (m |*> x)
+-- prop> (n m) |*> x = n |*> (m |*> x)
 --
--- and lifts to Integers since @x@ has an (additive) inverse. As per the multiplicative
--- examples, instead of using something like the arbitrary-precision integers, we just
--- wrap 'Int'.
-instance Num b => Action (Summation Int) b where
-    (|*>) (Summation n) x
+-- The action lifts to 'Integer' because every @x@ has an (additive) inverse. As per the
+-- examples above, instead of using something like the arbitrary-precision integers, we
+-- just wrap 'Int'.
+instance Num b => Action (Multiplication Int) b where
+    (|*>) (Multiplication n) x
         = sum (replicate (abs n) y)
         where y = if n >= 0 then x else -x

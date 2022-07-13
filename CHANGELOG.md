@@ -9,6 +9,7 @@
 * Use Endo wrapper instead of homegrown one.
 * Drop extraneous wrapping.
 * Drop multiplicative action on Num instances.
+* Drop Summation wrapper.
 * Documentation improvements.
 
 note(s):
