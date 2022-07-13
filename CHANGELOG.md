@@ -8,3 +8,4 @@
 
 * Minor changes to the cabal file.
 * Bungled monoid identities in Summation and Multiplication.
+* Missing monoid action.

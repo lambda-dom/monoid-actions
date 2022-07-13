@@ -37,18 +37,15 @@ module Data.Monoid.Action
 
 -- Imports.
 import Data.Monoid (Dual (..))
+import Data.Foldable (Foldable(foldl'))
 
 -- $documentation
 -- 'Action' instances fall in two main families. The first is the construction of
 -- @Action m@ instances from the fact that the underlying-type functor creates all
 -- limits and colimits. The second family are instances @Action Natural@ where
 -- 'Natural' are the (Peano) natural numbers and roughly correspond to /do something @n@ times/.
--- Since there is some ambiguity involved for the natural action @Monoid b => Act Natural b@
--- we restrict ourselves to the algebraic context and slap a @Num b@ constraint instead.
--- If base had an Abelian group type class we could generalize more easily.
 
--- |
--- The type class for a left 'Monoid' action. It must satisfy the following two
+-- | The type class for a left 'Monoid' action. It must satisfy the following two
 -- laws:
 --
 -- __Identity__:
@@ -299,3 +296,13 @@ instance Monoid (Multiplication Word) where
 
 instance Num b => RightAction (Multiplication Word) (Multiplication b) where
     (<*|) (Multiplication x) (Multiplication n) = Multiplication (product (replicate (fromIntegral n) x))
+
+
+-- | The action @Monoid m => Natural -> m -> m@ given by (written multiplicatively)
+--
+--  @
+--    m \<*| n = m \<\> ... \<\> m = m ^ n
+--  @
+--
+instance Monoid m => RightAction (Multiplication Word) m where
+    (<*|) x (Multiplication n) = foldl' (<>) mempty (replicate (fromIntegral n) x)
