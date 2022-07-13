@@ -19,24 +19,22 @@ module Data.Monoid.Action
         , Free (..)
         , Cofree (..)
 
-        -- ** Adjunction-related functions.
+        -- * Adjunction-related functions.
         , free
         , extract
         , cofree
         , copure
         , coextract
 
-        -- * 'Monoid' wrappers.
-        , Endomorphisms (..)
-
-        -- * 'Num' wrappers.
-        , Summation (..)
+        -- * Monoid wrappers.
+        -- $monoid-wrappers
         , Multiplication (..)
+        , Summation (..)
     )
     where
 
 -- Imports.
-import Data.Monoid (Dual (..))
+import Data.Monoid (Dual (..), Endo (Endo))
 import Data.Foldable (Foldable(foldl'))
 
 -- $documentation
@@ -76,8 +74,8 @@ class Monoid m => RightAction m a where
 
 -- Class-related functions.
 -- | Actions @Action m a@ are in bijection with (monoid) homomorphisms @m -> Endomorphisms a@.
-homomorphism :: Action m a => m -> Endomorphisms a
-homomorphism m = Endomorphisms (m |*>)
+homomorphism :: Action m a => m -> Endo a
+homomorphism m = Endo (m |*>)
 
 
 -- Instances.
@@ -112,6 +110,11 @@ instance Action m a => Action m (Maybe a) where
 instance (Action m a , Action m b) => Action m (Either a b) where
     (|*>) m (Left x) = Left (m |*> x)
     (|*>) m (Right y) = Right (m |*> y)
+
+
+-- | Endomorphisms action.
+instance Action (Endo a) a where
+    (|*>) (Endo f) x = f x
 
 
 -- | Isomorphism between the categories of left and right actions.
@@ -176,7 +179,6 @@ instance Monoid m => Action m (Cofree m a) where
     (|*>) m (Cofree t) = Cofree (t . (<> m))
 
 
--- Adjunction-related functions.
 -- | Universal property of @Free m a@.
 --
 -- An adjunction, although involving two universal properties, is completely determined
@@ -215,37 +217,49 @@ coextract (Cofree f) = f mempty
 copure :: Action m b => b -> Cofree m b
 copure x = Cofree (|*> x)
 
--- Monoid wrappers.
--- | Endomorphisms action.
---
--- Wrapper for the @a -> a@ type to construct non-overlapping action instance.
-newtype Endomorphisms a
-    = Endomorphisms (a -> a)    -- ^ The constructor for @f :: a -> a@.
 
-
-instance Semigroup (Endomorphisms a) where
-    (<>) (Endomorphisms g) (Endomorphisms f) = Endomorphisms (g . f)
-
-
-instance Monoid (Endomorphisms a) where
-    mempty = Endomorphisms id
-
-
-instance Action (Endomorphisms a) a where
-    (|*>) (Endomorphisms f) x = f x
-
-
--- Num wrappers.
--- | A wrapper to construct the action @Integer -> Num -> Num@ given by
+-- $monoid-wrappers
+-- The action @Monoid m => Natural -> m -> m@ given by (written multiplicatively) where
+-- @Natural@ is the monoid of the Natural numbers under addition. 
 --
 --  @
---      n |*> x = x + ... + x = n x
+--    x \<*| n = x \<\> ... \<\> x = x ^ n
 --  @
 --
--- Instead of constructing the action on arbitrary precision integers, we bring it
--- down to 'Int'. Strictly speaking this is not an action because of overflow,
--- but if you are hitting overflow you have bigger problems than violation of the
--- action laws.
+-- Another way to view this action is to note that @Natural@ is the free monoid on @()@ so
+-- that we have an isomorphism
+--
+-- \[
+--  M\to \mathbf{Mon}(\mathbb{N}, M)
+-- \]
+--
+-- Where \(\mathbf{Mon}\) is the category of monoid. The action is precisely the curried
+-- version of this isomorphism. Note that while the monoid /morphisms/ are morphisms for
+-- addition, the /action/ is on the right and involves the multiplication, that is, the
+-- action law takes the exponential form
+--
+-- @
+--  (x ^ n) ^ m = x ^ (nm)
+-- @
+--
+-- Instead of constructing the action on say, the (Peano) naturals, we bring it down to
+-- 'Word'. Strictly speaking this is not an action because of overflow, but if you are
+-- hitting overflow you have bigger problems than violation of the action laws. To avoid
+-- confusion and instance overlapping, we wrap 'Word' in a 'Multiplication' wrapper.
+
+-- | A wrapper for monoids in a multiplicative guise.
+newtype Multiplication a
+    = Multiplication a      -- ^ The constructor for @x :: a@.
+
+
+instance Semigroup (Multiplication Word) where
+    (<>) (Multiplication m) (Multiplication n) = Multiplication (m * n)
+
+
+instance Monoid (Multiplication Word) where
+    mempty = Multiplication 1
+
+-- | A wrapper for (abelian) monoids in an additive guise.
 newtype Summation a
     = Summation a      -- ^ The constructor for @x :: a@.
 
@@ -258,51 +272,17 @@ instance Monoid (Summation Int) where
     mempty = Summation 0
 
 
-instance Num b => Action (Summation Int) (Summation b) where
-    (|*>) (Summation n) (Summation x)
-        = Summation (sum (replicate (abs n) y))
-        where y = if n >= 0 then x else -x
-
-
--- | A wrapper to construct the right action @Natural -> Num -> Num@.
---
---  @
---      x <*| n = x * ... * x = x ^ n
---  @
---
--- Instead of constructing the action on arbitrary precision positive integers (or Peano
--- naturals), we bring it down to 'Word'. Strictly speaking this is not an action because
--- of overflow, but if you are hitting overflow you have bigger problems than violation of
--- the action laws.
---
--- Note that besides the action law,
---
--- prop> (x ^ m) ^ n = x ^ (mn)
---
--- it also satisfies:
---
--- prop> x ^ (m + n) = x^m x^n
-newtype Multiplication a
-    = Multiplication a      -- ^ The constructor for @x :: a@.
-
-
-instance Semigroup (Multiplication Word) where
-    (<>) (Multiplication m) (Multiplication n) = Multiplication (m * n)
-
-
-instance Monoid (Multiplication Word) where
-    mempty = Multiplication 1
-
-
-instance Num b => RightAction (Multiplication Word) (Multiplication b) where
-    (<*|) (Multiplication x) (Multiplication n) = Multiplication (product (replicate (fromIntegral n) x))
-
-
--- | The action @Monoid m => Natural -> m -> m@ given by (written multiplicatively)
---
---  @
---    m \<*| n = m \<\> ... \<\> m = m ^ n
---  @
---
 instance Monoid m => RightAction (Multiplication Word) m where
     (<*|) x (Multiplication n) = foldl' (<>) mempty (replicate (fromIntegral n) x)
+
+
+instance Num b => Action (Summation Int) b where
+    (|*>) (Summation n) x
+        = sum (replicate (abs n) y)
+        where y = if n >= 0 then x else -x
+
+-- | The multiplicative action @Num b => b -> Natural -> b@.
+--
+-- Since there is overlapping with the right monoid action, we wrap @Num b@ as well.
+instance Num b => RightAction (Multiplication Word) (Multiplication b) where
+    (<*|) (Multiplication x) (Multiplication n) = Multiplication (product (replicate (fromIntegral n) x))
